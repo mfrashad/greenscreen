@@ -68,7 +68,10 @@
   // -- Base upload & detect ------------------------------------------------
 
   async function uploadBase() {
-    setStatus("Detecting green screen...");
+    const zone = $("#base-upload-zone");
+    setStatus("Uploading base image...");
+    showLoading(zone, "Uploading & detecting green screen...");
+
     const form = new FormData();
     form.append("base", baseFile);
 
@@ -89,6 +92,7 @@
         initCanvas();
         drawCanvas();
         updateZoomLabel();
+        removeLoading(zone);
         setStatus("Corners detected. Drag handles to adjust. Scroll to zoom.", "success");
       };
       baseImg.src = "data:image/jpeg;base64," + data.image;
@@ -98,6 +102,7 @@
       $("#base-upload-zone").classList.add("has-content");
       updateButtons();
     } catch (err) {
+      removeLoading(zone);
       setStatus("Detection failed: " + err.message, "error");
     }
   }
@@ -481,10 +486,17 @@
     debounceTimer = setTimeout(requestPreview, 300);
   }
 
+  let previewInFlight = false;
+
   async function requestPreview() {
     if (!baseFile || ssFiles.length === 0 || !corners) return;
+    if (previewInFlight) return;
+    previewInFlight = true;
 
+    const btn = $("#btn-preview");
+    setButtonLoading(btn, true, "Previewing");
     setStatus("Generating preview...");
+
     const form = new FormData();
     form.append("base", baseFile);
     form.append("screenshot", ssFiles[selectedSsIdx]);
@@ -507,6 +519,10 @@
       setStatus("Preview updated.", "success");
     } catch (err) {
       setStatus("Preview failed: " + err.message, "error");
+    } finally {
+      previewInFlight = false;
+      setButtonLoading(btn, false);
+      updateButtons();
     }
   }
 
@@ -567,15 +583,19 @@
     if (!baseFile || ssFiles.length === 0 || !corners) return;
 
     const total = ssFiles.length;
-    setStatus("Processing " + total + " screenshot(s)...");
-    $("#btn-process").disabled = true;
+    const btn = $("#btn-process");
+    setButtonLoading(btn, true, `Processing 0/${total}`);
+    showProgress(0, total);
     resultBlobs = [];
 
     try {
       for (let i = 0; i < total; i++) {
+        btn.textContent = `Processing ${i + 1}/${total}`;
         setStatus(`Processing ${i + 1} of ${total}...`);
+        showProgress(i + 0.5, total);
         const result = await processOne(ssFiles[i]);
         resultBlobs.push(result);
+        showProgress(i + 1, total);
         renderGallery();
       }
 
@@ -588,7 +608,9 @@
     } catch (err) {
       setStatus("Processing failed: " + err.message, "error");
     } finally {
-      $("#btn-process").disabled = false;
+      setButtonLoading(btn, false);
+      hideProgress();
+      updateButtons();
     }
   }
 
@@ -631,11 +653,49 @@
     fullRedraw();
   });
 
-  // -- Status --------------------------------------------------------------
+  // -- Status & Loading ----------------------------------------------------
 
   function setStatus(msg, type = "") {
     const el = $("#status");
     el.textContent = msg;
     el.className = "status" + (type ? " " + type : "");
+  }
+
+  function showLoading(parentEl, text) {
+    removeLoading(parentEl);
+    const overlay = document.createElement("div");
+    overlay.className = "loading-overlay";
+    overlay.innerHTML = `<div class="spinner"></div><div class="loading-text">${text}</div>`;
+    parentEl.appendChild(overlay);
+  }
+
+  function removeLoading(parentEl) {
+    const existing = parentEl.querySelector(".loading-overlay");
+    if (existing) existing.remove();
+  }
+
+  function setButtonLoading(btn, loading, loadingText) {
+    if (loading) {
+      btn._origText = btn.textContent;
+      btn.textContent = loadingText || btn.textContent;
+      btn.classList.add("loading");
+      btn.disabled = true;
+    } else {
+      btn.textContent = btn._origText || btn.textContent;
+      btn.classList.remove("loading");
+      btn.disabled = false;
+    }
+  }
+
+  function showProgress(current, total) {
+    const bar = $("#progress-bar");
+    const fill = $("#progress-fill");
+    bar.classList.add("visible");
+    fill.style.width = Math.round((current / total) * 100) + "%";
+  }
+
+  function hideProgress() {
+    $("#progress-bar").classList.remove("visible");
+    $("#progress-fill").style.width = "0%";
   }
 })();
