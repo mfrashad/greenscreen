@@ -527,3 +527,47 @@ button.loading::after {
 }
 
 #btn-download-all:hover { background: #444; }
+
+/* Image preview modal */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.9);
+  z-index: 100;
+  align-items: center;
+  justify-content: center;
+  cursor: zoom-out;
+}
+
+.modal-overlay.visible {
+  display: flex;
+}
+
+.modal-overlay img {
+  max-width: 90vw;
+  max-height: 90vh;
+  object-fit: contain;
+  border-radius: 8px;
+  cursor: default;
+}
+
+.modal-close {
+  position: absolute;
+  top: 16px;
+  right: 24px;
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 36px;
+  font-weight: 300;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity 0.15s;
+  padding: 0;
+  line-height: 1;
+}
+
+.modal-close:hover {
+  opacity: 1;
+}

@@ -524,6 +524,10 @@
         renderSsThumbs();
         debouncedPreview();
       });
+      img.addEventListener("dblclick", (e) => {
+        e.stopPropagation();
+        openModal(img.src);
+      });
 
       const del = document.createElement("button");
       del.className = "thumb-delete";
@@ -645,6 +649,8 @@
 
       const img = document.createElement("img");
       img.src = url;
+      img.style.cursor = "zoom-in";
+      img.addEventListener("click", () => openModal(url));
 
       const link = document.createElement("a");
       link.href = url;
@@ -779,4 +785,27 @@
     $("#progress-bar").classList.remove("visible");
     $("#progress-fill").style.width = "0%";
   }
+
+  // -- Image preview modal --------------------------------------------------
+
+  const modal = $("#image-modal");
+  const modalImg = $("#modal-img");
+
+  function openModal(src) {
+    modalImg.src = src;
+    modal.classList.add("visible");
+  }
+
+  function closeModal() {
+    modal.classList.remove("visible");
+    modalImg.src = "";
+  }
+
+  modal.addEventListener("click", (e) => {
+    if (e.target === modal) closeModal();
+  });
+  $("#modal-close").addEventListener("click", closeModal);
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && modal.classList.contains("visible")) closeModal();
+  });
 })();
