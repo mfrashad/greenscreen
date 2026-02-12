@@ -4,6 +4,10 @@ Replace green screens in images with screenshots or any other images. Automatica
 
 Works as both a **CLI tool** and an **interactive web UI**.
 
+**Try it live:** [greenscreen.onrender.com](https://greenscreen.onrender.com/)
+
+![Web UI screenshot](screenshot.jpeg)
+
 ## Features
 
 - **Automatic green screen detection** — HSV thresholding + contour analysis to find and outline the green region
