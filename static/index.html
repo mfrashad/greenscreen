@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Green Screen Replacement</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <div class="layout">
+    <header>
+      <h1>Green Screen Replacement</h1>
+    </header>
+
+    <div class="main">
+      <div class="editor-area">
+        <div class="upload-zone" id="ss-upload-zone">
+          <div class="upload-prompt" id="ss-prompt">
+            <p class="upload-icon">&#x1F5BC;</p>
+            <p>Drop multiple screenshots here</p>
+            <p class="upload-hint">Select or drop one or more images to composite</p>
+            <input type="file" id="ss-input" accept="image/*" multiple hidden>
+          </div>
+          <div id="ss-content" class="ss-content">
+            <div id="ss-thumbs" class="thumb-row"></div>
+            <div id="ss-add-bar" class="ss-add-bar">
+              <button id="btn-add-ss" type="button">+ Add more screenshots</button>
+              <p class="upload-hint">or drop images anywhere in this panel</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="upload-zone" id="base-upload-zone">
+          <div class="upload-prompt" id="base-prompt">
+            <p class="upload-icon">&#x1F4F7;</p>
+            <p>Drop base image here</p>
+            <p class="upload-hint">Image with green screen (e.g., laptop mockup)</p>
+            <input type="file" id="base-input" accept="image/*" hidden>
+          </div>
+          <canvas id="corner-canvas"></canvas>
+        </div>
+      </div>
+
+      <div class="sidebar">
+        <h3>Adjustments</h3>
+        <label>
+          Brightness
+          <input type="range" id="brightness" min="-100" max="100" value="0">
+          <span id="brightness-val">0</span>
+        </label>
+        <label>
+          Contrast
+          <input type="range" id="contrast" min="-100" max="100" value="0">
+          <span id="contrast-val">0</span>
+        </label>
+        <label>
+          Temperature
+          <input type="range" id="temperature" min="-50" max="50" value="0">
+          <span id="temperature-val">0</span>
+        </label>
+
+        <div class="actions">
+          <button id="btn-preview" disabled>Preview</button>
+          <button id="btn-process" disabled>Process All</button>
+          <button id="btn-toggle-overlay">Hide Guides</button>
+          <div class="zoom-row">
+            <button id="btn-zoom-reset">Reset Zoom</button>
+            <span id="zoom-label"></span>
+          </div>
+          <button id="btn-reset">Reset Corners</button>
+        </div>
+
+        <div id="status" class="status"></div>
+      </div>
+    </div>
+
+    <div class="output-area" id="output-area">
+      <div class="output-header">
+        <h3>Output</h3>
+        <button id="btn-download-all">Download All</button>
+      </div>
+      <div id="output-gallery" class="gallery"></div>
+    </div>
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
