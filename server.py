@@ -82,6 +82,8 @@ async def preview(
     brightness: float = Form(0),
     contrast: float = Form(0),
     temperature: float = Form(0),
+    saturation: float = Form(0),
+    blur: float = Form(0),
 ):
     """Generate preview with given parameters."""
     base_img = decode_upload(await base.read())
@@ -92,6 +94,7 @@ async def preview(
     result = greenscreen.process_from_arrays(
         base_img, ss_img, corners=corner_pts,
         brightness=brightness, contrast=contrast, temperature=temperature,
+        saturation=saturation, blur=blur,
     )
 
     preview, _ = resize_for_preview(result)
@@ -107,6 +110,8 @@ async def process_one(
     brightness: float = Form(0),
     contrast: float = Form(0),
     temperature: float = Form(0),
+    saturation: float = Form(0),
+    blur: float = Form(0),
 ):
     """Process a single screenshot at full resolution, return PNG."""
     base_img = decode_upload(await base.read())
@@ -117,6 +122,7 @@ async def process_one(
     result = greenscreen.process_from_arrays(
         base_img, ss_img, corners=corner_pts,
         brightness=brightness, contrast=contrast, temperature=temperature,
+        saturation=saturation, blur=blur,
     )
 
     result_bytes = encode_image(result, ".png")

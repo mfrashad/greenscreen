@@ -559,7 +559,7 @@
 
   // -- Sliders -------------------------------------------------------------
 
-  ["brightness", "contrast", "temperature"].forEach((id) => {
+  ["brightness", "contrast", "temperature", "saturation", "blur"].forEach((id) => {
     const input = $(`#${id}`);
     const valSpan = $(`#${id}-val`);
     input.addEventListener("input", () => {
@@ -593,6 +593,8 @@
     form.append("brightness", $("#brightness").value);
     form.append("contrast", $("#contrast").value);
     form.append("temperature", $("#temperature").value);
+    form.append("saturation", $("#saturation").value);
+    form.append("blur", $("#blur").value);
 
     try {
       const res = await fetch("/api/preview", { method: "POST", body: form });
@@ -627,6 +629,8 @@
     form.append("brightness", $("#brightness").value);
     form.append("contrast", $("#contrast").value);
     form.append("temperature", $("#temperature").value);
+    form.append("saturation", $("#saturation").value);
+    form.append("blur", $("#blur").value);
 
     const res = await fetch("/api/process-one", { method: "POST", body: form });
     if (!res.ok) throw new Error(await res.text());

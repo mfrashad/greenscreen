@@ -72,9 +72,10 @@ def apply_perspective(screenshot, corners, base_shape):
     return warped
 
 
-def adjust_lighting(warped, base, mask, brightness=0, contrast=0, temperature=0):
+def adjust_lighting(warped, base, mask, brightness=0, contrast=0, temperature=0,
+                    saturation=0, blur=0):
     """Adjust lighting of warped screenshot to match base image surroundings."""
-    if brightness == 0 and contrast == 0 and temperature == 0:
+    if brightness == 0 and contrast == 0 and temperature == 0 and saturation == 0 and blur == 0:
         # Auto-match brightness from surrounding area
         kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (25, 25))
         dilated = cv2.dilate(mask, kernel, iterations=3)
@@ -115,6 +116,19 @@ def adjust_lighting(warped, base, mask, brightness=0, contrast=0, temperature=0)
     warped_lab[:, :, 0] = np.clip(l_channel, 0, 255).astype(np.uint8)
     warped_lab[:, :, 2] = np.clip(b_channel, 0, 255).astype(np.uint8)
     warped = cv2.cvtColor(warped_lab, cv2.COLOR_LAB2BGR)
+
+    # Saturation: convert to HSV, scale S channel
+    if saturation != 0:
+        hsv = cv2.cvtColor(warped, cv2.COLOR_BGR2HSV).astype(np.float32)
+        factor = (100 + saturation) / 100.0
+        hsv[:, :, 1] = np.clip(hsv[:, :, 1] * factor, 0, 255)
+        warped = cv2.cvtColor(hsv.astype(np.uint8), cv2.COLOR_HSV2BGR)
+
+    # Blur: Gaussian blur with odd kernel size
+    if blur > 0:
+        ksize = int(blur) * 2 + 1
+        warped = cv2.GaussianBlur(warped, (ksize, ksize), 0)
+
     return warped
 
 
@@ -205,6 +219,7 @@ def process_bulk(base_path, screenshot_paths, output_dir, corners=None,
 
 def process_from_arrays(base, screenshot, corners=None,
                         brightness=0, contrast=0, temperature=0,
+                        saturation=0, blur=0,
                         hue_range=(35, 85), sat_min=50, val_min=50):
     """Process from numpy arrays (for server use). Returns result array."""
     mask = detect_green_mask(base, hue_range, sat_min, val_min)
@@ -214,7 +229,8 @@ def process_from_arrays(base, screenshot, corners=None,
 
     ordered = order_corners(corners)
     warped = apply_perspective(screenshot, ordered, base.shape)
-    warped = adjust_lighting(warped, base, mask, brightness, contrast, temperature)
+    warped = adjust_lighting(warped, base, mask, brightness, contrast, temperature,
+                             saturation, blur)
 
     comp_mask = np.zeros(base.shape[:2], dtype=np.uint8)
     cv2.fillConvexPoly(comp_mask, ordered.astype(np.int32), 255)
