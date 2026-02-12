@@ -1,6 +1,7 @@
 """FastAPI web server for green screen replacement tool."""
 
 import base64
+import json
 import os
 
 import cv2
@@ -47,6 +48,14 @@ async def index():
         return f.read()
 
 
+@app.get("/api/templates")
+async def templates():
+    """Return predefined template list with pre-detected corners."""
+    path = os.path.join("static", "templates", "corners.json")
+    with open(path) as f:
+        return json.load(f)
+
+
 @app.post("/api/detect")
 async def detect(base: UploadFile = File(...)):
     """Upload base image, return detected corners and preview."""
@@ -78,7 +87,6 @@ async def preview(
     base_img = decode_upload(await base.read())
     ss_img = decode_upload(await screenshot.read())
 
-    import json
     corner_pts = np.array(json.loads(corners), dtype=np.float32)
 
     result = greenscreen.process_from_arrays(
@@ -104,7 +112,6 @@ async def process_one(
     base_img = decode_upload(await base.read())
     ss_img = decode_upload(await screenshot.read())
 
-    import json
     corner_pts = np.array(json.loads(corners), dtype=np.float32)
 
     result = greenscreen.process_from_arrays(

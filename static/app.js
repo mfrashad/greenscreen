@@ -17,6 +17,10 @@
   let debounceTimer = null;
   let showOverlay = true;
   let lastPreviewImg = null;   // cached preview Image for redraw
+  let selectedTemplateId = null; // currently selected predefined template
+
+  // Expose state for debugging/saving
+  window.__gs = () => ({ corners, originalCorners, imgW, imgH, selectedTemplateId });
 
   // -- Zoom & Pan state ----------------------------------------------------
 
@@ -55,6 +59,8 @@
 
   setupDropZone($("#base-upload-zone"), $("#base-input"), (files) => {
     baseFile = files[0];
+    selectedTemplateId = null;
+    document.querySelectorAll(".template-thumb").forEach((el) => el.classList.remove("selected"));
     uploadBase();
   }, canvas);
 
@@ -64,6 +70,81 @@
     renderSsThumbs();
     updateButtons();
   }, $("#ss-content"));
+
+  // -- Template picker ------------------------------------------------------
+
+  async function loadTemplates() {
+    try {
+      const res = await fetch("/api/templates");
+      if (!res.ok) return;
+      const data = await res.json();
+      const scroll = $("#template-scroll");
+      scroll.innerHTML = "";
+
+      data.templates.forEach((tmpl) => {
+        const img = document.createElement("img");
+        img.className = "template-thumb";
+        img.src = `/static/templates/thumbs/${tmpl.filename}`;
+        img.title = tmpl.id;
+        img.dataset.id = tmpl.id;
+        img.addEventListener("click", () => selectTemplate(tmpl));
+        scroll.appendChild(img);
+      });
+    } catch (e) {
+      // Silently fail — templates are optional
+    }
+  }
+
+  async function selectTemplate(tmpl) {
+    const zone = $("#base-upload-zone");
+    setStatus("Loading template...");
+    showLoading(zone, "Loading template...");
+
+    // Highlight selected thumbnail
+    document.querySelectorAll(".template-thumb").forEach((el) => {
+      el.classList.toggle("selected", el.dataset.id === tmpl.id);
+    });
+    selectedTemplateId = tmpl.id;
+
+    // Set pre-detected corners (no /api/detect call needed)
+    corners = tmpl.corners;
+    originalCorners = JSON.parse(JSON.stringify(tmpl.corners));
+    imgW = tmpl.width;
+    imgH = tmpl.height;
+
+    // Fetch full-res JPEG and create a File blob for existing endpoints
+    try {
+      const resp = await fetch(`/static/templates/${tmpl.filename}`);
+      if (!resp.ok) throw new Error("Failed to fetch template image");
+      const blob = await resp.blob();
+      baseFile = new File([blob], tmpl.filename, { type: "image/jpeg" });
+
+      // Load into canvas
+      const url = URL.createObjectURL(blob);
+      baseImg = new Image();
+      baseImg.onload = () => {
+        zoom = 1; panX = 0; panY = 0;
+        lastPreviewImg = null;
+        initCanvas();
+        drawCanvas();
+        updateZoomLabel();
+        removeLoading(zone);
+        setStatus("Template loaded. Drag handles to adjust corners.", "success");
+        URL.revokeObjectURL(url);
+      };
+      baseImg.src = url;
+
+      $("#base-prompt").classList.add("hidden");
+      canvas.classList.add("visible");
+      $("#base-upload-zone").classList.add("has-content");
+      updateButtons();
+    } catch (err) {
+      removeLoading(zone);
+      setStatus("Failed to load template: " + err.message, "error");
+    }
+  }
+
+  loadTemplates();
 
   // -- Base upload & detect ------------------------------------------------
 
