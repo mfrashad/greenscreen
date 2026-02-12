@@ -98,6 +98,20 @@ The web server exposes these endpoints:
 | `POST` | `/api/preview` | Generate a preview composite with given parameters |
 | `POST` | `/api/process-one` | Process a single screenshot at full resolution, returns PNG |
 
+## Deploy to Render
+
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/mfrashad/greenscreen)
+
+Or deploy manually:
+
+1. Fork this repo
+2. Create a new **Web Service** on [Render](https://render.com)
+3. Connect your fork, select the `main` branch
+4. Render will auto-detect the `Dockerfile` — no extra config needed
+5. Choose the **Free** plan and click **Deploy**
+
+The free tier spins down after 15 minutes of inactivity (expect a 30-60s cold start on the first request).
+
 ## Requirements
 
 - Python 3.8+
