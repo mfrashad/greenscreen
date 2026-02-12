@@ -524,7 +524,11 @@
         renderSsThumbs();
         debouncedPreview();
       });
-      img.addEventListener("dblclick", (e) => {
+      const view = document.createElement("button");
+      view.className = "thumb-view";
+      view.innerHTML = "&#x1F441;";
+      view.title = "Preview";
+      view.addEventListener("click", (e) => {
         e.stopPropagation();
         openModal(img.src);
       });
@@ -542,6 +546,7 @@
       });
 
       item.appendChild(img);
+      item.appendChild(view);
       item.appendChild(del);
       container.appendChild(item);
     });
@@ -649,8 +654,12 @@
 
       const img = document.createElement("img");
       img.src = url;
-      img.style.cursor = "zoom-in";
-      img.addEventListener("click", () => openModal(url));
+
+      const view = document.createElement("button");
+      view.className = "gallery-view";
+      view.innerHTML = "&#x1F441;";
+      view.title = "Preview";
+      view.addEventListener("click", () => openModal(url));
 
       const link = document.createElement("a");
       link.href = url;
@@ -658,6 +667,7 @@
       link.textContent = "Download";
 
       item.appendChild(img);
+      item.appendChild(view);
       item.appendChild(link);
       gallery.appendChild(item);
     });

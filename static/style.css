@@ -546,7 +546,7 @@ button.loading::after {
 
 .modal-overlay img {
   max-width: 90vw;
-  max-height: 90vh;
+  max-height: 80vh;
   object-fit: contain;
   border-radius: 8px;
   cursor: default;
@@ -570,4 +570,36 @@ button.loading::after {
 
 .modal-close:hover {
   opacity: 1;
+}
+
+/* View button (eye icon) on thumbnails and gallery items */
+.thumb-view, .gallery-view {
+  position: absolute;
+  bottom: -6px;
+  right: -6px;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.75);
+  color: #fff;
+  border: 2px solid #1a1a2e;
+  font-size: 14px;
+  line-height: 1;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.thumb-item:hover .thumb-view,
+.gallery-item:hover .gallery-view {
+  opacity: 1;
+}
+
+.thumb-view:hover, .gallery-view:hover {
+  background: #4ade80;
+  color: #1a1a2e;
 }
