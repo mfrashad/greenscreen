@@ -572,34 +572,29 @@ button.loading::after {
   opacity: 1;
 }
 
-/* View button (eye icon) on thumbnails and gallery items */
-.thumb-view, .gallery-view {
+/* Fullscreen view button on screenshot thumbnails */
+.thumb-fullscreen {
   position: absolute;
-  bottom: -6px;
-  right: -6px;
-  width: 26px;
-  height: 26px;
-  border-radius: 50%;
+  bottom: 6px;
+  left: 50%;
+  transform: translateX(-50%);
   background: rgba(0, 0, 0, 0.75);
   color: #fff;
-  border: 2px solid #1a1a2e;
-  font-size: 14px;
-  line-height: 1;
-  padding: 0;
+  border: none;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 3px 8px;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   opacity: 0;
   transition: opacity 0.15s;
+  white-space: nowrap;
 }
 
-.thumb-item:hover .thumb-view,
-.gallery-item:hover .gallery-view {
+.thumb-item:hover .thumb-fullscreen {
   opacity: 1;
 }
 
-.thumb-view:hover, .gallery-view:hover {
-  background: #4ade80;
-  color: #1a1a2e;
+.thumb-fullscreen:hover {
+  background: rgba(0, 0, 0, 0.9);
 }

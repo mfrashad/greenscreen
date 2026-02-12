@@ -525,9 +525,8 @@
         debouncedPreview();
       });
       const view = document.createElement("button");
-      view.className = "thumb-view";
-      view.innerHTML = "&#x1F441;";
-      view.title = "Preview";
+      view.className = "thumb-fullscreen";
+      view.textContent = "View in Fullscreen";
       view.addEventListener("click", (e) => {
         e.stopPropagation();
         openModal(img.src);
@@ -654,12 +653,8 @@
 
       const img = document.createElement("img");
       img.src = url;
-
-      const view = document.createElement("button");
-      view.className = "gallery-view";
-      view.innerHTML = "&#x1F441;";
-      view.title = "Preview";
-      view.addEventListener("click", () => openModal(url));
+      img.style.cursor = "zoom-in";
+      img.addEventListener("click", () => openModal(url));
 
       const link = document.createElement("a");
       link.href = url;
@@ -667,7 +662,6 @@
       link.textContent = "Download";
 
       item.appendChild(img);
-      item.appendChild(view);
       item.appendChild(link);
       gallery.appendChild(item);
     });
